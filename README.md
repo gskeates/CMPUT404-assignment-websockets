@@ -21,6 +21,7 @@ Contributors / Licensing
 ========================
 
 Generally everything is LICENSE'D under the Apache 2 license by Abram Hindle.
+sockets.py and static/index.html are also LICENSE'D under the Apache 2 license by Graeme Keates.
 
 freetests.py is LICENSE'D under a BSD-like license:
 
@@ -59,3 +60,9 @@ Contributors
 * Mark Galloway
 * Abram Hindle
 * Cole Mackenzie
+* Graeme Keates
+
+Sources
+=======
+
+
