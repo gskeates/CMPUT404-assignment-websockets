@@ -136,7 +136,7 @@ def subscribe_socket(ws):
             # Tell client about update
             ws.send(message)
     except Exception as e:
-        print("WS Error %s" % e)
+        print("WS Error ", e)
     finally:
         clients.remove(client)
         gevent.kill(g)
