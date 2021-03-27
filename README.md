@@ -66,4 +66,8 @@ Contributors
 Sources
 =======
 
+Code available at https://github.com/uofa-cmput404/cmput404-slides/blob/master/examples/WebSocketsExamples/chat.py
 
+* Client class
+* Functions subscribe_socket and read_ws
+* Generally consulted to learn how the server should handle websockets
