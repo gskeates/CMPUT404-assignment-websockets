@@ -60,6 +60,7 @@ class World:
     def world(self):
         return self.space
 
+# Citation: https://github.com/uofa-cmput404/cmput404-slides/blob/master/examples/WebSocketsExamples/chat.py
 class Client:
     def __init__(self):
         self.queue = queue.Queue()
@@ -79,7 +80,6 @@ def set_listener( entity, data ):
     # Update clients
     point = { entity: data }
     for client in clients:
-        print(point)
         client.put(json.dumps(point))
 
 
@@ -90,6 +90,7 @@ def hello():
     '''Return something coherent here.. perhaps redirect to /static/index.html '''
     return redirect('/static/index.html', code=302)
 
+# Citation: https://github.com/uofa-cmput404/cmput404-slides/blob/master/examples/WebSocketsExamples/chat.py
 def read_ws(ws, client):
     '''A greenlet function that reads from the websocket and updates the world'''
     # XXX: TODO IMPLEMENT ME
@@ -115,6 +116,7 @@ def read_ws(ws, client):
     except:
         '''Done'''
 
+# Citation: https://github.com/uofa-cmput404/cmput404-slides/blob/master/examples/WebSocketsExamples/chat.py
 @sockets.route('/subscribe')
 def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
