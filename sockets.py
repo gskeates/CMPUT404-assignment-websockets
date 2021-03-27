@@ -36,9 +36,6 @@ class World:
     def add_set_listener(self, listener):
         self.listeners.append(listener)
 
-    def remove(self, listener):
-        self.listeners.remove(listener)
-
     def update(self, entity, key, value):
         entry = self.space.get(entity,dict())
         entry[key] = value
@@ -63,10 +60,27 @@ class World:
     def world(self):
         return self.space
 
+class Client:
+    def __init__(self):
+        self.queue = queue.Queue()
+
+    def put(self, v):
+        self.queue.put_nowait(v)
+
+    def get(self):
+        return self.queue.get()
+
 myWorld = World()
+clients = list()
 
 def set_listener( entity, data ):
     ''' do something with the update ! '''
+
+    # Update clients
+    point = { entity: data }
+    for client in clients:
+        print(point)
+        client.put(json.dumps(point))
 
 
 myWorld.add_set_listener(set_listener)
@@ -79,17 +93,23 @@ def hello():
 def read_ws(ws, client):
     '''A greenlet function that reads from the websocket and updates the world'''
     # XXX: TODO IMPLEMENT ME
-
     # Read messages from client
     try:
         while True:
             msg = ws.receive()
-            print("WS RECV: ", msg)
             if msg is not None:
+                # Grab update from client web socket
                 packet = json.loads(msg)
 
-                # Add to listeners bucket
-                # send_all_json( packet )
+                # Either fetch entire world or update listeners
+                if "getWorld" in packet.keys() and packet["getWorld"]:
+                    ws.send(json.dumps(myWorld.world()))
+                else:
+                    entity = list(packet.keys())[0]
+                    data = packet[entity]
+
+                    myWorld.set(entity, data)
+
             else:
                 break
     except:
@@ -100,26 +120,24 @@ def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
        websocket and read updates from the websocket '''
     # XXX: TODO IMPLEMENT ME
-
-    # Create new client
+    # New client object
+    client = Client()
+    clients.append(client)
 
     # Spawn thread to read messages
-    g = gevent.spawn(read_ws, ws, set_listener)
-
-    # Block for updates from client
+    g = gevent.spawn(read_ws, ws, client)
+    # Send messages back to client
     try:
         while True:
-            # Get update to world, send back to client
-            pass
-            # msg = myWorld.get()
-            # print(msg)
-            # ws.send(msg)
-    except Exception as e:# WebSocketError as e:
-        print("WS Error ", e)
+            # Get update from listeners
+            message = client.get()
+            # Tell client about update
+            ws.send(message)
+    except Exception as e:
+        print("WS Error %s" % e)
     finally:
-        myWorld.remove(listener)
+        clients.remove(client)
         gevent.kill(g)
-
 
 # I give this to you, this is how you get the raw body/data portion of a post in flask
 # this should come with flask but whatever, it's not my project.

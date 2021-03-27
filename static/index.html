@@ -80,10 +80,11 @@ function clearFrame() {
 
 // This actually draws the frame
 function renderFrame() {
+    // console.log("Rendering frame!");
     clearFrame();
     for (var key in world) {
         var entity = world[key];
-        drawCircle(context,prepEntity(entity));
+        drawCircle(context, prepEntity(entity));
     }
 }
 
@@ -123,16 +124,11 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     world[entity] = data;
-    // drawNextFrame(); // (but should we?)
+    drawNextFrame(); // (but should we?)
     //XXX: Send a web socket message that updates the entity you just modified!
-    var body = {
-      entity: data
-    }
-    var message = {
-      "body": body,
-      "method": "PUT"
-    }
-    // socket.send(JSON.stringify(message));
+    var object = {}
+    object[entity] = data
+    socket.send(JSON.stringify(object));
 }
 var counter = 0;
 function addEntityWithoutName(data) {
@@ -262,13 +258,11 @@ function wsSetup() {
     socket = new WebSocket(url);
     socket.onopen = function() {
         //XXX: TODO What are you going to do here?
-        console.log("Web socket opened!");
         // Grab world from server
 
         // Prepare message
         var message = {
-          "url": host + "/world",
-          "method": "GET"
+          "getWorld": true
         }
 
         // Send message
@@ -276,11 +270,11 @@ function wsSetup() {
 
     };
     socket.onerror = function(msg) {
-        debug("WebSocket Error:" + msg.data);
+        debug("WebSocket Error: " + msg.data);
     };
     socket.onmessage = function(msg) {
         try {
-            debug("WebSocket Recv:" + msg.data);
+            // debug("WebSocket Recv: " + msg.data);
             //XXX: TODO What are you going to do here?
             var response = JSON.parse(msg.data)
             // Update world with response from server
